@@ -13,11 +13,10 @@ const rl = readline_1.default.createInterface({
     input: process.stdin,
     output: process.stdout,
 });
-function startRecording() {
+const startRecording = () => {
     console.log('Recording started...');
     console.log('Press "s" to stop recording.');
     isRecording = true;
-    console.log('checkpoint');
     mic = new node_microphone_1.default({
         bitwidth: 16,
         channels: 1,
@@ -25,8 +24,8 @@ function startRecording() {
         rate: 16000,
     });
     micStream = mic.startRecording();
-}
-function stopRecording() {
+};
+const stopRecording = () => {
     console.log('Recording stopped.');
     isRecording = false;
     mic.stopRecording();
@@ -50,10 +49,10 @@ function stopRecording() {
             micStream.end();
         });
     }
-}
-function getIsRecording() {
+};
+const getIsRecording = () => {
     return isRecording;
-}
+};
 exports.default = {
     startRecording,
     stopRecording,

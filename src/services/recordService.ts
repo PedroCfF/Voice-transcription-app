@@ -1,17 +1,18 @@
 import Microphone from 'node-microphone';
 import fs from 'fs';
 import readline from 'readline';
+import { FileStream, ReadlineInterface } from '../types';
 
 let isRecording: boolean = false;
 let mic: Microphone;
 let micStream: any;
 
-const rl = readline.createInterface({
+const rl: ReadlineInterface = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-function startRecording() {
+const startRecording = (): void => {
   console.log('Recording started...');
   console.log('Press "s" to stop recording.');
   isRecording = true;
@@ -26,7 +27,7 @@ function startRecording() {
   micStream = mic.startRecording();
 }
 
-function stopRecording() {
+const stopRecording = (): void => {
   console.log('Recording stopped.');
   isRecording = false;
   mic.stopRecording();
@@ -36,7 +37,7 @@ function stopRecording() {
       if (!filename.endsWith('.wav')) {
         filename += '.wav';
       }
-      const outputFile = fs.createWriteStream(filename, { encoding: 'binary' });
+      const outputFile: FileStream = fs.createWriteStream(filename, { encoding: 'binary' });
 
       micStream.on('data', (data: any) => {
         outputFile.write(data);
@@ -57,7 +58,7 @@ function stopRecording() {
   }
 }
 
-function getIsRecording() {
+const getIsRecording = (): boolean => {
   return isRecording;
 }
 

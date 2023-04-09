@@ -7,7 +7,7 @@ const handleKeypress = (): void => {
   process.stdin.setRawMode(true);
 
   process.stdin.on('keypress', (_str, key) => {
-    if (key.name === 'r' && !recordService.getIsRecording()) {
+    if (key.name === 'r' && !recordService.getIsRecording() && !recordService.getIsBeingNamed()) {
       recordService.startRecording();
     }
 

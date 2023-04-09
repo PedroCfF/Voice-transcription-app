@@ -7,6 +7,7 @@ const node_microphone_1 = __importDefault(require("node-microphone"));
 const fs_1 = __importDefault(require("fs"));
 const readline_1 = __importDefault(require("readline"));
 let isRecording = false;
+let isBeingNamed = false;
 let mic;
 let micStream;
 const rl = readline_1.default.createInterface({
@@ -27,9 +28,10 @@ const startRecording = () => {
 };
 const stopRecording = () => {
     console.log('Recording stopped.');
-    isRecording = false;
     mic.stopRecording();
+    isRecording = false;
     if (micStream) {
+        isBeingNamed = true;
         rl.question('Enter a filename for the audio file: ', (filename) => {
             if (!filename.endsWith('.wav')) {
                 filename += '.wav';
@@ -47,14 +49,19 @@ const stopRecording = () => {
                 rl.close();
             });
             micStream.end();
+            isBeingNamed = false;
         });
     }
 };
 const getIsRecording = () => {
     return isRecording;
 };
+const getIsBeingNamed = () => {
+    return isBeingNamed;
+};
 exports.default = {
     startRecording,
     stopRecording,
-    getIsRecording
+    getIsRecording,
+    getIsBeingNamed
 };

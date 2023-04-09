@@ -4,6 +4,7 @@ import readline from 'readline';
 import { FileStream, ReadlineInterface } from '../types';
 
 let isRecording: boolean = false;
+let isBeingNamed: boolean = false;
 let mic: Microphone;
 let micStream: any;
 
@@ -29,14 +30,19 @@ const startRecording = (): void => {
 
 const stopRecording = (): void => {
   console.log('Recording stopped.');
-  isRecording = false;
   mic.stopRecording();
+  isRecording = false;
 
   if (micStream) {
+    isBeingNamed = true;
+
     rl.question('Enter a filename for the audio file: ', (filename) => {
       if (!filename.endsWith('.wav')) {
         filename += '.wav';
       }
+
+      const folderPath = 'audioFiles/';
+      filename = folderPath + filename;
       const outputFile: FileStream = fs.createWriteStream(filename, { encoding: 'binary' });
 
       micStream.on('data', (data: any) => {
@@ -54,6 +60,7 @@ const stopRecording = (): void => {
       });
 
       micStream.end();
+      isBeingNamed = false;
     });
   }
 }
@@ -62,8 +69,13 @@ const getIsRecording = (): boolean => {
   return isRecording;
 }
 
+const getIsBeingNamed = (): boolean => {
+  return isBeingNamed;
+}
+
 export default {
   startRecording,
   stopRecording,
-  getIsRecording
+  getIsRecording,
+  getIsBeingNamed
 };

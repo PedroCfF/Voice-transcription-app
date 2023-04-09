@@ -26,6 +26,19 @@ const startRecording = (): void => {
   });
 
   micStream = mic.startRecording();
+
+  // Create a temporary file to store the audio data
+  const tempFile: FileStream = fs.createWriteStream('temp_audio_data', { encoding: 'binary' });
+
+  // Set up the events
+  micStream.on('data', (data: any) => {
+    console.log('Received data:', data);
+    tempFile.write(data);
+  });
+
+  micStream.on('error', (error: any) => {
+    console.error('Error:', error);
+  });
 }
 
 const stopRecording = (): void => {
@@ -43,21 +56,19 @@ const stopRecording = (): void => {
 
       const folderPath = 'audioFiles/';
       filename = folderPath + filename;
-      const outputFile: FileStream = fs.createWriteStream(filename, { encoding: 'binary' });
 
-      micStream.on('data', (data: any) => {
-        outputFile.write(data);
-      });
+      // Read the temporary file
+      const tempData = fs.readFileSync('temp_audio_data', { encoding: 'binary' });
 
-      micStream.on('error', (error: any) => {
-        console.error('Error:', error);
-      });
+      // Write the temporary data to the new file
+      fs.writeFileSync(filename, tempData, { encoding: 'binary' });
 
-      micStream.on('end', () => {
-        console.log(`Audio file saved as ${filename}`);
-        outputFile.end();
-        rl.close();
-      });
+      console.log(`Audio file saved as ${filename}`);
+
+      // Delete the temporary file
+      fs.unlinkSync('temp_audio_data');
+
+      rl.close();
 
       micStream.end();
       isBeingNamed = false;

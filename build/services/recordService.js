@@ -25,6 +25,16 @@ const startRecording = () => {
         rate: 16000,
     });
     micStream = mic.startRecording();
+    // Create a temporary file to store the audio data
+    const tempFile = fs_1.default.createWriteStream('temp_audio_data', { encoding: 'binary' });
+    // Set up the events
+    micStream.on('data', (data) => {
+        console.log('Received data:', data);
+        tempFile.write(data);
+    });
+    micStream.on('error', (error) => {
+        console.error('Error:', error);
+    });
 };
 const stopRecording = () => {
     console.log('Recording stopped.');
@@ -36,18 +46,16 @@ const stopRecording = () => {
             if (!filename.endsWith('.wav')) {
                 filename += '.wav';
             }
-            const outputFile = fs_1.default.createWriteStream(filename, { encoding: 'binary' });
-            micStream.on('data', (data) => {
-                outputFile.write(data);
-            });
-            micStream.on('error', (error) => {
-                console.error('Error:', error);
-            });
-            micStream.on('end', () => {
-                console.log(`Audio file saved as ${filename}`);
-                outputFile.end();
-                rl.close();
-            });
+            const folderPath = 'audioFiles/';
+            filename = folderPath + filename;
+            // Read the temporary file
+            const tempData = fs_1.default.readFileSync('temp_audio_data', { encoding: 'binary' });
+            // Write the temporary data to the new file
+            fs_1.default.writeFileSync(filename, tempData, { encoding: 'binary' });
+            console.log(`Audio file saved as ${filename}`);
+            // Delete the temporary file
+            fs_1.default.unlinkSync('temp_audio_data');
+            rl.close();
             micStream.end();
             isBeingNamed = false;
         });
